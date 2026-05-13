@@ -1,260 +1,66 @@
-````md
 # Joomla Lightweight Backup Tools
 
-Lightweight PHP backup scripts for Joomla websites running on shared hosting environments without SSH access.
-
-Designed for:
-- FTP-only hosting
-- Shared hosting
-- Low memory servers
-- Timeout-sensitive environments
-- Large Joomla installations
-
-These scripts create:
-- Full Joomla files ZIP backup
-- Full MySQL database SQL/GZIP backup
-
-Both scripts work in chunked batches with browser auto-refresh to avoid server timeouts.
+Minimal PHP backup scripts for shared hosting environments without SSH access. Designed to handle timeouts and low memory via chunked processing and browser auto-refresh.
 
 ---
 
-# Features
+## Core Features
 
-## File Backup Script (`backup.php`)
+### File Backup (backup.php)
 
-- Chunked ZIP creation
-- Auto-refresh progress UI
-- Low memory usage
-- Timeout resistant
-- Excludes cache/tmp/logs automatically
-- Download-ready ZIP archive
+* Creates ZIP archives in chunks.
+* Auto-excludes cache, tmp, and logs.
+* Progress UI with auto-refresh.
 
-## Database Backup Script (`db-backup.php`)
+### Database Backup (db-backup.php)
 
-- Chunked SQL export
-- Auto-refresh progress UI
-- Large database friendly
-- GZIP compression
-- Table-by-table export
-- Shared hosting optimized
+* Incremental SQL export with GZIP compression.
+* Table-by-table processing.
+* Shared hosting optimized.
 
 ---
 
-# Requirements
+## Setup & Security
 
-- PHP 7.4+
-- ZipArchive extension enabled
-- MySQLi enabled
-- Write permissions in Joomla root
-
----
-
-# Installation
-
-Upload both files into Joomla root:
-
-```text
-backup.php
-db-backup.php
-```
-
-Example Joomla root:
-
-```text
-administrator/
-components/
-images/
-plugins/
-templates/
-configuration.php
-backup.php
-db-backup.php
-```
+1. Upload backup.php and db-backup.php to the Joomla root.
+2. Edit both files to set a unique $TOKEN value.
+3. For db-backup.php, manually enter your MySQL credentials.
 
 ---
 
-# Security Configuration
+## Usage
 
-Before usage, edit both scripts and change:
+Access the scripts via your browser using your secret token:
 
-```php
-$TOKEN = 'CHANGE_THIS_SECRET_TOKEN';
-```
+* Files: [yourdomain.com/backup.php?token=SECRET](https://www.google.com/search?q=https://yourdomain.com/backup.php%3Ftoken%3DSECRET)
+* Database: [yourdomain.com/db-backup.php?token=SECRET](https://www.google.com/search?q=https://yourdomain.com/db-backup.php%3Ftoken%3DSECRET)
 
-Use a long random token.
-
-Example:
-
-```php
-$TOKEN = 'my-super-secret-token-123';
-```
+To restart a process, append &reset=1 to the URL.
 
 ---
 
-# File Backup Usage
+## Directory Structure
 
-Open:
-
-```text
-https://yourdomain.com/backup.php?token=YOUR_TOKEN
-```
-
-The script will:
-1. Scan Joomla files
-2. Create ZIP in chunks
-3. Auto-refresh every few seconds
-4. Show live progress
-5. Generate downloadable ZIP archive
-
-Generated backups are stored in:
-
-```text
-_backup_tmp/
-```
+* File backups: _backup_tmp/
+* DB backups: _db_backup_tmp/
 
 ---
 
-# Database Backup Usage
+## Recommended Workflow
 
-Configure DB credentials inside:
-
-```php
-$dbHost
-$dbUser
-$dbPass
-$dbName
-```
-
-Then open:
-
-```text
-https://yourdomain.com/db-backup.php?token=YOUR_TOKEN
-```
-
-The script will:
-1. Export tables incrementally
-2. Export rows in batches
-3. Auto-refresh progress
-4. Generate `.sql`
-5. Generate compressed `.sql.gz`
-
-Generated backups are stored in:
-
-```text
-_db_backup_tmp/
-```
+1. Run db-backup.php and download the .sql.gz file.
+2. Run backup.php and download the .zip file.
+3. Delete both scripts and their temporary backup folders from the server immediately after use.
 
 ---
 
-# Reset Backup
+## Restore Process
 
-To reset running backup:
-
-## File backup
-
-```text
-https://yourdomain.com/backup.php?token=YOUR_TOKEN&reset=1
-```
-
-## Database backup
-
-```text
-https://yourdomain.com/db-backup.php?token=YOUR_TOKEN&reset=1
-```
+* Database: Import the SQL file via phpMyAdmin or Adminer.
+* Files: Extract the ZIP and upload contents to the root via FTP.
 
 ---
 
-# Recommended Workflow
-
-## Step 1
-
-Run database backup first:
-
-```text
-db-backup.php
-```
-
-Download:
-- `.sql.gz`
-
----
-
-## Step 2
-
-Run files backup:
-
-```text
-backup.php
-```
-
-Download:
-- `.zip`
-
----
-
-# Restore Guide
-
-## Restore Database
-
-Using Adminer or phpMyAdmin:
-
-1. Create empty database
-2. Import `.sql` or `.sql.gz`
-
----
-
-## Restore Files
-
-Upload extracted ZIP contents back to hosting root via FTP.
-
----
-
-# Notes
-
-These scripts are optimized for:
-- Shared hosting
-- No SSH access
-- Large Joomla sites
-- Slow hosting providers
-- Timeout-prone environments
-
-The scripts intentionally:
-- Avoid long-running single requests
-- Use chunked processing
-- Use browser refresh instead of AJAX
-- Minimize RAM usage
-
----
-
-# Important Security Notice
-
-After downloading backups:
-
-DELETE:
-- `backup.php`
-- `db-backup.php`
-- `_backup_tmp/`
-- `_db_backup_tmp/`
-
-Never leave backup scripts publicly accessible.
-
----
-
-# Excluded Directories
-
-The file backup excludes:
-
-```text
-cache/
-tmp/
-logs/
-administrator/cache/
-_backup_tmp/
-```
-
----
-
-# License
+## License
 
 MIT
-````
